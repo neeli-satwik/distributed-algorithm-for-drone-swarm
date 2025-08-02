@@ -1,7 +1,7 @@
 // Ankit's Part
 
-#ifndef TIME_UTILIS_H
-#define TIME_UTILIS_H
+#ifndef TIME_UTILS_H
+#define TIME_UTILS_H
 
 #include <Arduino.h>
 #include <bits/stdc++.h>

@@ -158,4 +158,80 @@ void handleReceivedMessage(const DroneMessage& msg) {
     Serial.println("✅ Message processed successfully\n");
 }
 
-void printDetail
+void printDetailedStats() {
+    CommStats stats = comm.getStats();
+    
+    Serial.println("\n" + String("=").repeat(60));
+    Serial.println("📊 DETAILED COMMUNICATION ANALYSIS");
+    Serial.println(String("=").repeat(60));
+    
+    // Basic statistics
+    Serial.printf("🔢 Message Statistics:\n");
+    Serial.printf("   Messages Sent: %lu\n", stats.messagesSent);
+    Serial.printf("   Messages Received: %lu\n", stats.messagesReceived);
+    Serial.printf("   Total Messages: %lu\n", messagesReceived);
+    
+    if (stats.messagesSent > 0) {
+        float successRate = 100.0 * stats.messagesSent / (stats.messagesSent + stats.messagesLost);
+        Serial.printf("   Success Rate: %.1f%%\n", successRate);
+    }
+    
+    // Signal quality
+    Serial.printf("\n📶 Signal Quality:\n");
+    Serial.printf("   Last RSSI: %d dBm\n", stats.lastRSSI);
+    Serial.printf("   Last SNR: %.1f dB\n", stats.lastSNR);
+    
+    // System status
+    Serial.printf("\n💻 System Status:\n");
+    Serial.printf("   Uptime: %s\n", formatUptime(millis()).c_str());
+    Serial.printf("   Free Heap: %d bytes\n", ESP.getFreeHeap());
+    Serial.printf("   Node ID: %d\n", comm.getNodeId());
+    
+    Serial.println(String("=").repeat(60) + "\n");
+}
+
+void printSystemInfo() {
+    Serial.println("\n💻 System Information:");
+    Serial.printf("   Chip: %s (Rev %d)\n", ESP.getChipModel(), ESP.getChipRevision());
+    Serial.printf("   CPU: %d MHz\n", ESP.getCpuFreqMHz());
+    Serial.printf("   Flash: %d bytes\n", ESP.getFlashChipSize());
+    Serial.printf("   Free Heap: %d bytes\n", ESP.getFreeHeap());
+    Serial.printf("   SDK: %s\n", ESP.getSdkVersion());
+}
+
+String getMessageTypeName(uint8_t type) {
+    switch (type) {
+        case MSG_HEARTBEAT: return "HEARTBEAT";
+        case MSG_GOSSIP: return "GOSSIP";
+        case MSG_MUTEX_REQUEST: return "MUTEX_REQUEST";
+        case MSG_MUTEX_RESPONSE: return "MUTEX_RESPONSE";
+        case MSG_RAFT_VOTE_REQUEST: return "RAFT_VOTE_REQUEST";
+        case MSG_RAFT_VOTE_RESPONSE: return "RAFT_VOTE_RESPONSE";
+        case MSG_MISSION_UPDATE: return "MISSION_UPDATE";
+        case MSG_TARGET_FOUND: return "TARGET_FOUND";
+        case MSG_EMERGENCY_STOP: return "EMERGENCY_STOP";
+        case MSG_STATUS_REQUEST: return "STATUS_REQUEST";
+        case MSG_STATUS_RESPONSE: return "STATUS_RESPONSE";
+        default: return "UNKNOWN";
+    }
+}
+
+String getStatusName(uint8_t status) {
+    switch (status) {
+        case 0: return "OK";
+        case 1: return "WARNING";
+        case 2: return "CRITICAL";
+        default: return "UNKNOWN";
+    }
+}
+
+String formatUptime(unsigned long ms) {
+    unsigned long seconds = ms / 1000;
+    unsigned long minutes = seconds / 60;
+    unsigned long hours = minutes / 60;
+    
+    seconds %= 60;
+    minutes %= 60;
+    
+    return String(hours) + "h " + String(minutes) + "m " + String(seconds) + "s";
+}
